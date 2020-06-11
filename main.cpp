@@ -17,23 +17,26 @@ int main(int argc, char * argv[]) {
 
 	// Parse the fixed vertex definitions if any
 	// They are give in format --fixed-vertex coordX coordY coordZ
-	// TODO: Include the 0.0 0.0 parameters after the fixed vertex?
 	std::vector<FixedVertexDefinition> fixedVertices;
-	for (int i=3; i+3<argc; ) {
+	for (int i=3; i+5<argc; ) {
 		if (strcmp(argv[i], "--fixed-vertex")) {
 			i++;
 			continue;
 		}
 
-		FixedVertexDefinition currentFixedVertex(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]));
+		FixedVertexDefinition currentFixedVertex(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]), atof(argv[i+5]));
 		fixedVertices.push_back(currentFixedVertex);
-		i += 4;
+		i += 6;
 	}
 
 	std::cout << "--> Reading mesh..." << std::endl;
 	Mesh mesh;
 	mesh.read_obj(argv[1]);
-	mesh.apply_fixed_vertices(fixedVertices);
+
+	if (fixedVertices.size() > 0) {
+		std::cout << "--> Applying fixed vertices..." << std::endl;
+		mesh.apply_fixed_vertices(fixedVertices);
+	}
 
 	FormTrait traits(&mesh);
 
