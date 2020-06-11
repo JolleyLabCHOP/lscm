@@ -6,6 +6,7 @@
 #include <fstream>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 #include <map>
 #include "FormTrait.h"
 
@@ -470,3 +471,18 @@ int Mesh::write_obj(const char * output) {
 	return 0;
 }
 
+void Mesh::apply_fixed_vertices(std::vector<FixedVertexDefinition> fixedVertices) {
+	for (std::list<Vertex*>::iterator viter = m_vertices.begin(); viter != m_vertices.end(); ++viter) {
+		Vertex* currentVertex = *viter;
+
+		for (std::vector<FixedVertexDefinition>::iterator fiter = fixedVertices.begin(); fiter != fixedVertices.end(); ++fiter) {
+			FixedVertexDefinition fixedVertex = *fiter;
+			if (fixedVertex.matches_vertex_point(currentVertex)) {
+				std::stringstream fixedVertexStream;
+				fixedVertexStream << "fix " << fixedVertex.m_fix[0] << " " << fixedVertex.m_fix[1];
+				std::string fixedVertexString(fixedVertexStream.str());
+				currentVertex->string() = fixedVertexString;
+			}
+		}
+	}
+}

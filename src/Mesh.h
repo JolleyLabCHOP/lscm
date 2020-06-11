@@ -12,6 +12,7 @@
 #include "Point.h"
 #include <list>
 #include <map>
+#include <vector>
 
 namespace MeshLib {
 	class Vertex;
@@ -84,6 +85,8 @@ namespace MeshLib {
 		std::list<Edge*> &edges() { return m_edges; };
 		std::list<Face*> &faces() { return m_faces; };
 		std::list<Vertex*> &vertices() { return m_vertices; };
+
+		void apply_fixed_vertices(std::vector<FixedVertexDefinition> fixedVertices);
 
 	protected:
 		std::list<Edge*> m_edges;

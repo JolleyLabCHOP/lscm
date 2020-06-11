@@ -45,6 +45,16 @@ namespace MeshLib {
 		Trait *m_trait;
 		std::string m_string;
 	};
+
+	class FixedVertexDefinition {
+	public:
+		FixedVertexDefinition(double x, double y, double z) { m_vertex = Point(x, y, z); m_fix[0] = 0.0; m_fix[1] = 0.0; };
+
+		bool matches_vertex_point(Vertex* vertex);
+
+		Point m_vertex;
+		double m_fix[2];
+	};
 }
 
 #endif
