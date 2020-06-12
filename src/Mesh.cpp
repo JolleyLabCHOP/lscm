@@ -460,7 +460,7 @@ int Mesh::write_obj(const char * output) {
 
 		HalfEdge *he = f->halfedge();
 		do {
-			fprintf(_os, " %d/%d", he->target()->id(),he->target()->id());
+			fprintf(_os, " %d//%d", he->target()->id(),he->target()->id());
 			he = he->he_next();
 		} while (he != f->halfedge());
 
