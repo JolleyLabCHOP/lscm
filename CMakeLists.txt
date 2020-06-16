@@ -12,4 +12,4 @@ include_directories(eigen3)
 set(SOURCES src/Boundary.cpp src/Edge.cpp src/Face.cpp src/FormTrait.cpp src/LSCM.cpp
             src/HalfEdge.cpp src/Homology.cpp src/Mesh.cpp src/Vertex.cpp src/Graph.cpp)
 
-add_executable(main main.cpp ${SOURCES})
+add_executable(lscm main.cpp ${SOURCES})
