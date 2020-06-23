@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
 	std::string outFilePath("");
 	std::vector<FixedVertexDefinition> fixedVertices;
 	while (currentArgument < argc) {
-		if (!strcmp(argv[currentArgument], "--fixed-vertex") || !strcmp(argv[currentArgument], "-v")) {
+		if (!strcmp(argv[currentArgument], "--fixedPoint") || !strcmp(argv[currentArgument], "-p")) {
 			currentArgument++;
 			std::string fixedVertexArg(argv[currentArgument]);
 			double fixedVertexPos[3] = {0.0, 0.0, 0.0};
@@ -45,7 +45,7 @@ int main(int argc, char * argv[])
 			FixedVertexDefinition currentFixedVertex(fixedVertexPos[0], fixedVertexPos[1], fixedVertexPos[2]);
 			fixedVertices.push_back(currentFixedVertex);
 		}
-		else if (!strcmp(argv[currentArgument], "--fixed-coords") || !strcmp(argv[currentArgument], "-c")) {
+		else if (!strcmp(argv[currentArgument], "--fixedTextureCoords") || !strcmp(argv[currentArgument], "-c")) {
 			for (int i=0; i<fixedVertices.size(); ++i) {
 				double fixedTexturePos[2] = {0.0, 0.0};
 				std::stringstream ss;
