@@ -68,6 +68,12 @@ int main(int argc, char * argv[])
 	std::cout << "--> Reading mesh..." << std::endl;
 	Mesh mesh;
 	mesh.read_obj(inFilePath.c_str());
+	if (mesh.numVertices() == 0) {
+		std::cerr << "Failed to read mesh from file " << inFilePath << std::endl;
+		return 1;
+	} else {
+		std::cout << "Mesh read successfully. " << mesh.numVertices() << " vertices and " << mesh.numFaces() << " cells." << std::endl;
+	}
 
 	if (fixedVertices.size() > 0) {
 		std::cout << "--> Applying fixed vertices..." << std::endl;
