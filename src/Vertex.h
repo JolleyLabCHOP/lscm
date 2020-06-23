@@ -49,7 +49,9 @@ namespace MeshLib {
 	class FixedVertexDefinition {
 	public:
 		FixedVertexDefinition(double x, double y, double z, double f0, double f1) { m_vertex = Point(x, y, z); m_fix[0] = f0; m_fix[1] = f1; };
+		FixedVertexDefinition(double x, double y, double z) { m_vertex = Point(x, y, z); };
 
+		void set_fixed_points(double f0, double f1) { m_fix[0] = f0; m_fix[1] = f1; };
 		bool matches_vertex_point(Vertex* vertex);
 
 		Point m_vertex;
