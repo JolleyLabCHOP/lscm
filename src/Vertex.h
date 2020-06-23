@@ -33,6 +33,8 @@ namespace MeshLib {
 		HalfEdge *most_ccw_out_halfedge();
 		HalfEdge *most_clw_out_halfedge();
 
+		double distance_to_point(Point &point);
+
 	private:
 		int m_id;
 
@@ -48,13 +50,13 @@ namespace MeshLib {
 
 	class FixedVertexDefinition {
 	public:
-		FixedVertexDefinition(double x, double y, double z, double f0, double f1) { m_vertex = Point(x, y, z); m_fix[0] = f0; m_fix[1] = f1; };
-		FixedVertexDefinition(double x, double y, double z) { m_vertex = Point(x, y, z); };
+		FixedVertexDefinition(double x, double y, double z, double f0, double f1) { m_vertex_point = Point(x, y, z); m_fix[0] = f0; m_fix[1] = f1; };
+		FixedVertexDefinition(double x, double y, double z) { m_vertex_point = Point(x, y, z); };
 
 		void set_fixed_points(double f0, double f1) { m_fix[0] = f0; m_fix[1] = f1; };
 		bool matches_vertex_point(Vertex* vertex);
 
-		Point m_vertex;
+		Point m_vertex_point;
 		double m_fix[2];
 	};
 }

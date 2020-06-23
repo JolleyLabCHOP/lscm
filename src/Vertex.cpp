@@ -57,13 +57,21 @@ HalfEdge *Vertex::most_clw_out_halfedge() {
 	return he;
 }
 
+double MeshLib::Vertex::distance_to_point(Point &point)
+{
+	return sqrt(
+		(m_point.x() - point.x()) * (m_point.x() - point.x()) +
+		(m_point.y() - point.y()) * (m_point.y() - point.y()) +
+		(m_point.z() - point.z()) * (m_point.z() - point.z()) );
+}
+
 bool FixedVertexDefinition::matches_vertex_point(Vertex* vertex) {
 	if (!vertex) {
 		return false;
 	}
 
 	double epsilon = 0.00001; // OBJ precision is 6
-	return fabs(m_vertex.x() - vertex->point().x()) < epsilon
-		  && fabs(m_vertex.y() - vertex->point().y()) < epsilon
-		  && fabs(m_vertex.z() - vertex->point().z()) < epsilon;
+	return fabs(m_vertex_point.x() - vertex->point().x()) < epsilon
+		  && fabs(m_vertex_point.y() - vertex->point().y()) < epsilon
+		  && fabs(m_vertex_point.z() - vertex->point().z()) < epsilon;
 }

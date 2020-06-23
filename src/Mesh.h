@@ -28,7 +28,7 @@ namespace MeshLib {
 		typedef Face     * pFace;
 		typedef Mesh     * pMesh;
 
-		Mesh(){};
+		Mesh();
 		~Mesh();
 
 		int copy(Mesh &mesh);
@@ -88,10 +88,13 @@ namespace MeshLib {
 
 		void apply_fixed_vertices(std::vector<FixedVertexDefinition> fixedVertices);
 
+		bool fixed_vertices_inside_bounding_box(std::vector<FixedVertexDefinition> fixedVertices);
+
 	protected:
 		std::list<Edge*> m_edges;
 		std::list<Face*> m_faces;
 		std::list<Vertex*> m_vertices;
+		double m_bounding_box[6];
 
 		std::map<int, Vertex*> m_map_vertex;
 		std::map<int, Face*> m_map_face;

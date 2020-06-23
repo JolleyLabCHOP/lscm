@@ -3,14 +3,25 @@
 #include "Edge.h"
 #include "Face.h"
 #include "Mesh.h"
+#include "FormTrait.h"
+
 #include <fstream>
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include <map>
-#include "FormTrait.h"
+#include <iomanip>
 
 using namespace MeshLib;
+
+Mesh::Mesh() {
+	m_bounding_box[0] = DBL_MAX;
+	m_bounding_box[1] = DBL_MIN;
+	m_bounding_box[2] = DBL_MAX;
+	m_bounding_box[3] = DBL_MIN;
+	m_bounding_box[4] = DBL_MAX;
+	m_bounding_box[5] = DBL_MIN;
+}
 
 //access e->v
 Vertex *Mesh::edge_vertex_1(Edge  *e) {
@@ -224,6 +235,26 @@ int Mesh::read_obj(const char * filename) {
 			Vertex * v = create_vertex(vid);
 			v->point() = p;
 			v->id() = vid++;
+
+			// Determine bounding box
+			if (p.x() < m_bounding_box[0]) {
+				m_bounding_box[0] = p.x();
+			}
+			if (p.x() > m_bounding_box[1]) {
+				m_bounding_box[1] = p.x();
+			}
+			if (p.y() < m_bounding_box[2]) {
+				m_bounding_box[2] = p.y();
+			}
+			if (p.y() > m_bounding_box[3]) {
+				m_bounding_box[3] = p.y();
+			}
+			if (p.z() < m_bounding_box[4]) {
+				m_bounding_box[4] = p.z();
+			}
+			if (p.z() > m_bounding_box[5]) {
+				m_bounding_box[5] = p.z();
+			}
 
 			// Add feature points
             token = strtok(NULL, "\n");
@@ -472,17 +503,62 @@ int Mesh::write_obj(const char * output) {
 }
 
 void Mesh::apply_fixed_vertices(std::vector<FixedVertexDefinition> fixedVertices) {
-	for (std::list<Vertex*>::iterator viter = m_vertices.begin(); viter != m_vertices.end(); ++viter) {
-		Vertex* currentVertex = *viter;
-
+	// Detect need for RAS->LPS conversion of fixed points and apply if necessary
+	if (!fixed_vertices_inside_bounding_box(fixedVertices)) {
+		std::cout << "Fixed vertices outside bounding box were found. Trying to convert from RAS to LPS..." << std::endl;
+		std::vector<FixedVertexDefinition> fixedVerticesLPS;
 		for (std::vector<FixedVertexDefinition>::iterator fiter = fixedVertices.begin(); fiter != fixedVertices.end(); ++fiter) {
 			FixedVertexDefinition fixedVertex = *fiter;
-			if (fixedVertex.matches_vertex_point(currentVertex)) {
-				std::stringstream fixedVertexStream;
-				fixedVertexStream << "fix " << fixedVertex.m_fix[0] << " " << fixedVertex.m_fix[1];
-				std::string fixedVertexString(fixedVertexStream.str());
-				currentVertex->string() = fixedVertexString;
+			FixedVertexDefinition fixedVertexLPS(-fixedVertex.m_vertex_point.x(), -fixedVertex.m_vertex_point.y(), fixedVertex.m_vertex_point.z());
+			fixedVertexLPS.set_fixed_points(fixedVertex.m_fix[0], fixedVertex.m_fix[1]);
+			fixedVerticesLPS.push_back(fixedVertexLPS);
+		}
+		fixedVerticesLPS.swap(fixedVertices);
+	}
+	if (!fixed_vertices_inside_bounding_box(fixedVertices)) {
+		std::cerr << "Invalid fixed point definition detected: Fixed vertices outside bounding box were still found after RAS to LPS conversion." << std::endl;
+	}
+
+	// Find closest vertices to defined points and set them as fixed
+	int fixedVertexIndex = 0;
+	for (std::vector<FixedVertexDefinition>::iterator fiter = fixedVertices.begin(); fiter != fixedVertices.end(); ++fiter) {
+		FixedVertexDefinition fixedVertex = *fiter;
+		Vertex* closestVertex = NULL;
+		double minimumDistance = DBL_MAX;
+		for (std::list<Vertex*>::iterator viter = m_vertices.begin(); viter != m_vertices.end(); ++viter) {
+			Vertex* currentVertex = *viter;
+			double distance = currentVertex->distance_to_point(fixedVertex.m_vertex_point);
+			if (distance < minimumDistance) {
+				minimumDistance = distance;
+				closestVertex = currentVertex;
 			}
 		}
+		if (!closestVertex) {
+			std::cerr << "Failed to find closest vertex to fixed vertex #" << fixedVertexIndex << std::endl;
+			continue;
+		}
+		std::cout << std::setprecision(5) << "Closest vertex to fixed vertex #" << fixedVertexIndex << " found at distance " << minimumDistance << std::endl;
+		std::stringstream fixedVertexStream;
+		fixedVertexStream << "fix " << fixedVertex.m_fix[0] << " " << fixedVertex.m_fix[1];
+		std::string fixedVertexString(fixedVertexStream.str());
+		closestVertex->string() = fixedVertexString;
+		++fixedVertexIndex;
 	}
+}
+
+bool MeshLib::Mesh::fixed_vertices_inside_bounding_box(std::vector<FixedVertexDefinition> fixedVertices)
+{
+	for (std::vector<FixedVertexDefinition>::iterator fiter = fixedVertices.begin(); fiter != fixedVertices.end(); ++fiter) {
+		FixedVertexDefinition fixedVertex = *fiter;
+		bool inside = ( fixedVertex.m_vertex_point.x() >= m_bounding_box[0]
+			&& fixedVertex.m_vertex_point.x() <= m_bounding_box[1]
+			&& fixedVertex.m_vertex_point.y() >= m_bounding_box[2]
+			&& fixedVertex.m_vertex_point.y() <= m_bounding_box[3]
+			&& fixedVertex.m_vertex_point.z() >= m_bounding_box[4]
+			&& fixedVertex.m_vertex_point.z() <= m_bounding_box[5] );
+		if (!inside) {
+			return false;
+		}
+	}
+	return true;
 }
