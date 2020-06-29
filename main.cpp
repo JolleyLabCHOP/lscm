@@ -46,14 +46,40 @@ int main(int argc, char * argv[])
 			fixedVertices.push_back(currentFixedVertex);
 		}
 		else if (!strcmp(argv[currentArgument], "--fixedTextureCoords") || !strcmp(argv[currentArgument], "-c")) {
+			// Determine if the argument comes in individual coordinates or together and parse accordingly
+			std::string fixedCoordArg(argv[currentArgument+1]);
+			std::vector<std::string> fixedCoordsStrVector;
+			if (fixedCoordArg.find(" ") == std::string::npos) {
+				std::cout << "Fixed texture coordinates given separately in individual arguments" << std::endl;
+				for (int i=0; i<fixedVertices.size(); ++i) {
+					fixedCoordsStrVector.push_back(argv[currentArgument+1]);
+					fixedCoordsStrVector.push_back(argv[currentArgument+2]);
+					currentArgument += 2;
+				}
+			} else {
+				std::cout << "Fixed texture coordinates given together in a single argument" << std::endl;
+				size_t separatorPosition = fixedCoordArg.find(" ");
+				while (separatorPosition != std::string::npos) {
+					fixedCoordsStrVector.push_back(fixedCoordArg.substr(0, separatorPosition));
+					fixedCoordArg = fixedCoordArg.substr(separatorPosition+1);
+					separatorPosition = fixedCoordArg.find(" ");
+				}
+				if (!fixedCoordArg.empty()) {
+					fixedCoordsStrVector.push_back(fixedCoordArg);
+				}
+				currentArgument++;
+			}
+			if (fixedCoordsStrVector.size() != fixedVertices.size() * 2) {
+				std::cerr << "Failed to parse fixed texture coordinates correctly" << std::endl;
+				return 1;
+			}
 			for (int i=0; i<fixedVertices.size(); ++i) {
 				double fixedTexturePos[2] = {0.0, 0.0};
 				std::stringstream ss;
-				ss << argv[currentArgument+1] << " " << argv[currentArgument+2];
+				ss << fixedCoordsStrVector[2*i] << " " << fixedCoordsStrVector[2*i+1];
 				ss >> fixedTexturePos[0] >> fixedTexturePos[1];
-				//fixedVertices[i].set_fixed_points(atof(argv[currentArgument+1]), atof(argv[currentArgument+2]));
+				std::cout << "Fixed texture coordinates #" << i << ": " << fixedTexturePos[0] << ", " << fixedTexturePos[1] << std::endl;
 				fixedVertices[i].set_fixed_points(fixedTexturePos[0], fixedTexturePos[1]);
-				currentArgument += 2;
 			}
 		}
 		else if (inFilePath.empty()) {
