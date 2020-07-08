@@ -13,6 +13,8 @@
 #include <iomanip>
 #include <limits>
 
+#include <float.h>
+
 using namespace MeshLib;
 
 Mesh::Mesh() {
