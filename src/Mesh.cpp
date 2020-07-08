@@ -12,6 +12,8 @@
 #include <map>
 #include <iomanip>
 
+#include <float.h>
+
 using namespace MeshLib;
 
 Mesh::Mesh() {
