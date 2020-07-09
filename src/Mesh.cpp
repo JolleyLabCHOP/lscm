@@ -11,6 +11,7 @@
 #include <sstream>
 #include <map>
 #include <iomanip>
+#include <limits>
 
 using namespace MeshLib;
 
