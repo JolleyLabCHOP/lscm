@@ -24,6 +24,7 @@ int main(int argc, char * argv[])
 	std::string outFilePath("");
 	std::vector<FixedVertexDefinition> fixedVertices;
 	while (currentArgument < argc) {
+		// Fixed point positions: --fixedPoint or -p
 		if (!strcmp(argv[currentArgument], "--fixedPoint") || !strcmp(argv[currentArgument], "-p")) {
 			currentArgument++;
 			std::string fixedVertexArg(argv[currentArgument]);
@@ -43,9 +44,14 @@ int main(int argc, char * argv[])
 				ss >> fixedVertexPos[i];
 				fixedVertexArg = fixedVertexArg.substr(commaPos+1);
 			}
-			FixedVertexDefinition currentFixedVertex(fixedVertexPos[0], fixedVertexPos[1], fixedVertexPos[2]);
-			fixedVertices.push_back(currentFixedVertex);
+			// Only store the first two fixed vertices. The whole markups fiducial list is passed to the CLI, but
+			// we only need to use the first two for flattening. The rest are for the user for fitting.
+			if (fixedVertices.size() < 2) {
+				FixedVertexDefinition currentFixedVertex(fixedVertexPos[0], fixedVertexPos[1], fixedVertexPos[2]);
+				fixedVertices.push_back(currentFixedVertex);
+			}
 		}
+		// Fixed texture coordinates: --fixedTextureCoords or -c
 		else if (!strcmp(argv[currentArgument], "--fixedTextureCoords") || !strcmp(argv[currentArgument], "-c")) {
 			// Determine if the argument comes in individual coordinates or together and parse accordingly
 			std::string fixedCoordArg(argv[currentArgument+1]);
@@ -83,9 +89,11 @@ int main(int argc, char * argv[])
 				fixedVertices[i].set_fixed_points(fixedTexturePos[0], fixedTexturePos[1]);
 			}
 		}
+		// Input file
 		else if (inFilePath.empty()) {
 			inFilePath = std::string(argv[currentArgument]);
 		}
+		// Output file
 		else {
 			outFilePath = std::string(argv[currentArgument]);
 		}
